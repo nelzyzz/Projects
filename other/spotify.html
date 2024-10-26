@@ -66,7 +66,7 @@
         input[type="text"] {
             width: 80%;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 1px solid var(--primary-color);
             border-radius: 8px;
             background-color: rgba(238, 238, 238, 0.1);
@@ -121,6 +121,12 @@
             color: var(--primary-color);
         }
 
+        .notification {
+            margin-top: 10px;
+            color: #ff0000; /* Red for error messages */
+            font-size: 14px;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -137,10 +143,11 @@
 
     <div class="wrapper-container">
         <h1>Spotify Downloader</h1>
-        <input type="text" id="trackQuery" placeholder="Enter track name or artist">
+        <input type="text" id="trackQuery" placeholder="Enter Spotify Track URL">
         <button class="download-button" onclick="fetchTrack()">Download</button>
-
+        
         <div class="loading" id="loading">Loading...</div>
+        <div class="notification" id="notification"></div>
 
         <div class="result-container" id="result">
             <img id="trackImage" src="" alt="Track Image" width="200">
@@ -148,7 +155,7 @@
             <p><strong>Type:</strong> <span id="type"></span></p>
             <p><strong>Artist:</strong> <span id="artist"></span></p>
             <p><strong>Duration:</strong> <span id="duration"></span> seconds</p>
-            <p><strong>Download Link:</strong> <a href="#" id="downloadLink" target="_blank">Click Here</a></p>
+            <p><strong>Download:</strong> <a href="#" id="downloadLink" target="_blank">Click Here</a></p>
         </div>
     </div>
 
@@ -173,7 +180,15 @@
         });
 
         async function fetchTrack() {
-            const trackQuery = document.getElementById('trackQuery').value;
+            const trackQuery = document.getElementById('trackQuery').value.trim();
+            const notification = document.getElementById('notification');
+            notification.innerText = ''; // Clear previous notifications
+
+            if (!trackQuery) {
+                notification.innerText = 'Please enter a Spotify track URL.';
+                return;
+            }
+
             const apiUrl = `https://joshweb.click/api/spotify2?q=${encodeURIComponent(trackQuery)}`;
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
@@ -181,6 +196,13 @@
             try {
                 const response = await fetch(apiUrl);
                 const data = await response.json();
+
+                if (data.error) {
+                    notification.innerText = data.error;
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+
                 const result = data.result;
 
                 document.getElementById('title').innerText = result.title;
@@ -194,7 +216,7 @@
                 document.getElementById('result').style.display = 'block';
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
-                alert('Error fetching track data. Please try again.');
+                notification.innerText = 'Error fetching track data. Please try again.';
             }
         }
     </script>
