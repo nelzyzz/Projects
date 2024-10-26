@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Downloader</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <style>
+        :root {
+            --primary-color: #00adb5;
+            --secondary-color: #393e46;
+            --background-color: #222831;
+            --text-color: #eeeeee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .wrapper-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(57, 62, 70, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            animation: fadeInDown 1s ease;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+            color: var(--text-color);
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .download-button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-button:hover {
+            background-color: #007e85;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+        }
+
+        .result-container p, .result-container img {
+            margin-bottom: 10px;
+        }
+
+        .result-container img {
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            max-width: 100%;
+        }
+
+        .result-container a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="wrapper-container">
+        <h1>Spotify Downloader</h1>
+        <input type="text" id="trackQuery" placeholder="Enter track name or artist">
+        <button class="download-button" onclick="fetchTrack()">Download</button>
+
+        <div class="loading" id="loading">Loading...</div>
+
+        <div class="result-container" id="result">
+            <img id="trackImage" src="" alt="Track Image" width="200">
+            <p><strong>Title:</strong> <span id="title"></span></p>
+            <p><strong>Type:</strong> <span id="type"></span></p>
+            <p><strong>Artist:</strong> <span id="artist"></span></p>
+            <p><strong>Duration:</strong> <span id="duration"></span> seconds</p>
+            <p><strong>Download Link:</strong> <a href="#" id="downloadLink" target="_blank">Click Here</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+            },
+            retina_detect: true
+        });
+
+        async function fetchTrack() {
+            const trackQuery = document.getElementById('trackQuery').value;
+            const apiUrl = `https://joshweb.click/api/spotify2?q=${encodeURIComponent(trackQuery)}`;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const result = data.result;
+
+                document.getElementById('title').innerText = result.title;
+                document.getElementById('type').innerText = result.type;
+                document.getElementById('artist').innerText = result.artist;
+                document.getElementById('duration').innerText = Math.floor(result.duration / 1000);
+                document.getElementById('trackImage').src = result.image;
+                document.getElementById('downloadLink').href = result.download_url;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                alert('Error fetching track data. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
