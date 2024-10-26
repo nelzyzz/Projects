@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Search</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <style>
+        :root {
+            --primary-color: #00adb5;
+            --secondary-color: #393e46;
+            --background-color: #222831;
+            --text-color: #eeeeee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .wrapper-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(57, 62, 70, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            animation: fadeInDown 1s ease;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px 0 0 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+            color: var(--text-color);
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #007e85;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+        }
+
+        .result-container p {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .result-container a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .burat {
+            margin-top: 10px;
+            color: #ff0000; 
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            input[type="text"], .search-button {
+                font-size: 0.9rem;
+            }
+
+            .result-container p {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            input[type="text"], .search-button {
+                font-size: 0.8rem;
+            }
+
+            .loading, .burat {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="wrapper-container">
+        <h1>Spotify Search</h1>
+        <div class="search-container">
+            <input type="text" id="trackQuery" placeholder="Enter Spotify Track URL">
+            <button class="search-button" onclick="fetchTrack()">Search</button>
+        </div>
+        
+        <div class="loading" id="loading">Loading...</div>
+        <div class="burat" id="burat"></div>
+
+        <div class="result-container" id="result"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+            },
+            retina_detect: true
+        });
+
+        async function fetchTrack() {
+            const trackQuery = document.getElementById('trackQuery').value.trim();
+            const burat = document.getElementById('burat');
+            burat.innerText = '';
+
+            if (!trackQuery) {
+                burat.innerText = 'Please enter a Spotify track URL.';
+                return;
+            }
+
+            const apiUrl = `https://joshweb.click/search/spotify?q=${encodeURIComponent(trackQuery)}`;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (!data.status) {
+                    burat.innerText = 'Error fetching track data.';
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+
+                const results = data.result; 
+                let resultHtml = '';
+
+                results.forEach(track => {
+                    resultHtml += `
+                        <div>
+                            <p><strong>Title:</strong> ${track.title}</p>
+                            <p><strong>Artist:</strong> ${track.artist}</p>
+                            <p><strong>Duration:</strong> ${Math.floor(track.duration / 1000)} seconds</p>
+                            <p><strong>Album:</strong> <a href="${track.album_url}" target="_blank">View Album</a></p>
+                            <a href="${track.direct_url}" target="_blank">Listen</a>
+                            <hr>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('result').innerHTML = resultHtml;
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                burat.innerText = 'An error occurred while fetching track data.';
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
