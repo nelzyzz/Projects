@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burat</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <style>
+        :root {
+            --primary-color: #00adb5;
+            --secondary-color: #393e46;
+            --background-color: #222831;
+            --text-color: #eeeeee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .wrapper-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(57, 62, 70, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            animation: fadeInDown 1s ease;
+        }
+
+        .project-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .project-item:hover {
+            background-color: rgba(238, 238, 238, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .project-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .project-link:hover {
+            background-color: #007e85;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #particles-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="wrapper-container">
+        <h1>Projects</h1>
+        
+        <div class="project-item">
+            <h2>Auto Reactor</h2>
+            <p>An Auto Facebook post reactor using cookies datr</p>
+            <a href="https://auto-react.onrender.com/" class="project-link" target="_blank">View Project</a>
+        </div>
+        
+        <div class="project-item">
+            <h2>Share Booster</h2>
+            <p>An automated tool for sharing Facebook posts via URL and cookies.</p>
+            <a href="https://autosharee.vercel.app/" class="project-link" target="_blank">View Project</a>
+        </div>
+        
+        <div class="project-item">
+            <h2>YT Audio Downloader</h2>
+            <p>Youtube Video Downloader via link</p>
+            <a href="https://youtube-audio-downloaderr.vercel.app/" class="project-link" target="_blank">View Project</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: {
+                    grab: { distance: 400, line_linked: { opacity: 1 } },
+                    bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+                    repulse: { distance: 200, duration: 0.4 },
+                    push: { particles_nb: 4 },
+                    remove: { particles_nb: 2 }
+                }
+            },
+            retina_detect: true
+        });
+    </script>
+</body>
+</html>
