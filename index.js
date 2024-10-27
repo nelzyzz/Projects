@@ -26,6 +26,10 @@ app.get('/uploader', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Uploader.html'));
 });
 
+app.get('/xxx', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'xxx.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
