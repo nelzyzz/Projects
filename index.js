@@ -222,6 +222,26 @@ app.post('/logout', (req, res) => {
     });
 });
 
+app.get('/spotify', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'spotify.html'));
+});
+
+app.get('/spotifysearch', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'spotifysearch.html'));
+});
+
+app.get('/tiktokdl', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'tiktokdl.html'));
+});
+
+app.get('/uploader', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'Uploader.html'));
+});
+
+app.get('/xxx', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'xxx.html'));
+});
+
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.listen(PORT, () => {
