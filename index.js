@@ -13,7 +13,19 @@ const db = new sqlite3.Database(':memory:');
 
 db.serialize(() => {
     db.run("CREATE TABLE users (email TEXT, password TEXT)");
-    db.run("INSERT INTO users (email, password) VALUES ('admin@example.com', 'adminpass')");
+    const users = [
+        { email: 'admin@example.com', password: 'adminpass' },
+        { email: 'friend1@example.com', password: 'friend1pass' },
+        { email: 'friend2@example.com', password: 'friend2pass' },
+        { email: 'friend3@example.com', password: 'friend3pass' },
+        { email: 'friend4@example.com', password: 'friend4pass' }
+    ];
+
+    const stmt = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+    users.forEach(user => {
+        stmt.run(user.email, user.password);
+    });
+    stmt.finalize();
 });
 
 const storage = multer.diskStorage({
@@ -38,6 +50,26 @@ app.use(session({
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/spotify', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'spotify.html'));
+});
+
+app.get('/spotifysearch', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'spotifysearch.html'));
+});
+
+app.get('/tiktokdl', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'tiktokdl.html'));
+});
+
+app.get('/uploader', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'Uploader.html'));
+});
+
+app.get('/xxx', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'xxx.html'));
 });
 
 app.get('/admin', (req, res) => {
@@ -207,7 +239,7 @@ app.post('/login', (req, res) => {
             res.status(200).send('Success');
         } else {
             req.session.isAuthenticated = false;
-            res.status(401).send('Unauthorized');
+            res.status(401).send('Wrong Password');
         }
     });
 });
@@ -217,32 +249,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        res.redirect('/login');
-    });
+    req.session.destroy();
+    res.send('Logged out successfully!');
 });
-
-app.get('/spotify', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'spotify.html'));
-});
-
-app.get('/spotifysearch', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'spotifysearch.html'));
-});
-
-app.get('/tiktokdl', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'tiktokdl.html'));
-});
-
-app.get('/uploader', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Uploader.html'));
-});
-
-app.get('/xxx', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'xxx.html'));
-});
-
-app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
