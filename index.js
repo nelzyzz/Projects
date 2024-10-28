@@ -5,6 +5,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const sqlite3 = require('sqlite3').verbose();
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,11 +15,9 @@ const db = new sqlite3.Database(':memory:');
 db.serialize(() => {
     db.run("CREATE TABLE users (email TEXT, password TEXT)");
     const users = [
-        { email: 'admin@example.com', password: 'adminpass' },
-        { email: 'friend1@example.com', password: 'friend1pass' },
-        { email: 'friend2@example.com', password: 'friend2pass' },
-        { email: 'friend3@example.com', password: 'friend3pass' },
-        { email: 'friend4@example.com', password: 'friend4pass' }
+        { email: 'joshuaapostol909@gmail.com', password: 'kiffy' },
+        { email: 'joshuaapostol0967@gmail.com', password: 'kiffy' },
+        { email: 'admin@burat.com', password: 'burat' }
     ];
 
     const stmt = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
@@ -43,10 +42,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'your_secret_key',
+    secret: 'joshuaapostol0948',
     resave: false,
     saveUninitialized: true,
 }));
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO = process.env.GITHUB_REPO;
+const UPLOAD_PATH = process.env.UPLOAD_PATH;
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -72,10 +75,19 @@ app.get('/xxx', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'xxx.html'));
 });
 
+app.get('/account', (req, res) => {
+    db.all("SELECT email, password FROM users", [], (err, rows) => {
+        if (err) {
+            res.status(500).send('Error fetching users');
+            return;
+        }
+        res.json(rows);
+    });
+});
+
 app.get('/admin', (req, res) => {
     if (req.session.isAuthenticated) {
         const uploaded = fs.readdirSync(path.join(__dirname, 'public'));
-
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
@@ -231,26 +243,41 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-    const query = `SELECT * FROM users WHERE email='${email}' AND password='${password}'`;
-
-    db.get(query, (err, row) => {
-        if (row) {
-            req.session.isAuthenticated = true;
-            res.status(200).send('Success');
-        } else {
-            req.session.isAuthenticated = false;
-            res.status(401).send('Wrong Password');
+    const query = `SELECT * FROM users WHERE email = ? AND password = ?`;
+    db.get(query, [email, password], (err, row) => {
+        if (err || !row) {
+            res.status(401).send('Invalid email or password');
+            return;
         }
+        req.session.isAuthenticated = true;
+        res.redirect('/admin');
     });
 });
 
 app.post('/upload', upload.single('file'), (req, res) => {
-    res.send('File uploaded successfully!');
+    const filePath = path.join(__dirname, UPLOAD_PATH, req.file.originalname);
+    axios.put(`https://api.github.com/repos/${GITHUB_REPO}/contents/${UPLOAD_PATH}/${req.file.originalname}`, {
+        message: 'Upload file',
+        content: Buffer.from(fs.readFileSync(filePath)).toString('base64'),
+        branch: 'main'
+    }, {
+        headers: {
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    })
+    .then(response => {
+        res.send('File uploaded and updated in GitHub successfully');
+    })
+    .catch(error => {
+        console.error('Error updating GitHub:', error);
+        res.status(500).send('Error uploading file to GitHub.');
+    });
 });
 
 app.post('/logout', (req, res) => {
     req.session.destroy();
-    res.send('Logged out successfully!');
+    res.send('Logged out successfully');
 });
 
 app.listen(PORT, () => {
