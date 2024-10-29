@@ -71,7 +71,7 @@ app.get('/uploader', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Uploader.html'));
 });
 
-app.get('/ssweb', (req, res) => {
+app.get('/ss', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'ss.html'));
 });
 
