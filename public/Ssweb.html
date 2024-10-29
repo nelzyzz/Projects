@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ss Web</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <style>
+        :root {
+            --primary-color: #00adb5;
+            --secondary-color: #393e46;
+            --background-color: #222831;
+            --text-color: #eeeeee;
+            --error-color: #ff4d4d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .wrapper-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(57, 62, 70, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background-color: rgba(238, 238, 238, 0.1);
+            color: var(--text-color);
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .burat-button, .download-button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .burat-button:hover, .download-button:hover {
+            background-color: #007e85;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-container img {
+            max-width: 100%;
+            border: 5px solid var(--primary-color);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="wrapper-container">
+        <h1>Ss Web</h1>
+        <input type="text" id="urlInput" placeholder="Enter URL">
+        <button class="burat-button" onclick="pussy()">Screenshot</button>
+
+        <div class="loading" id="loading">Loading...</div>
+        <div class="error-message" id="error-message"></div>
+
+        <div class="result-container" id="result">
+            <img id="screenshotImage" src="" alt="Screenshot">
+            <button class="download-button" id="downloadButton" style="display: none;" onclick="bulbul()">Download</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle", stroke: { width: 0, color: "#000000" } },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+            },
+            retina_detect: true
+        });
+
+        async function pussy() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            const errorMessageElement = document.getElementById('error-message');
+            const loadingElement = document.getElementById('loading');
+            const resultElement = document.getElementById('result');
+            const screenshotImage = document.getElementById('screenshotImage');
+            const downloadButton = document.getElementById('downloadButton');
+
+            errorMessageElement.innerText = ''; 
+            loadingElement.style.display = 'block';
+            resultElement.style.display = 'none';
+            downloadButton.style.display = 'none';
+
+            if (!urlInput) {
+                errorMessageElement.innerText = 'Please enter a URL.';
+                loadingElement.style.display = 'none';
+                return;
+            }
+
+            const apiUrl = `https://rest-api.joshuaapostol.site/screenshot?url=${encodeURIComponent(urlInput)}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    errorMessageElement.innerText = data.error;
+                    loadingElement.style.display = 'none';
+                    return;
+                }
+
+                screenshotImage.src = data.screenshotURL;
+                screenshotImage.setAttribute("data-download-url", data.screenshotURL);
+                loadingElement.style.display = 'none';
+                resultElement.style.display = 'block';
+                downloadButton.style.display = 'inline-block';
+            } catch (error) {
+                errorMessageElement.innerText = 'Error fetching screenshot. Please try again.';
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        function bulbul() {
+            const screenshotImage = document.getElementById('screenshotImage');
+            const imageURL = screenshotImage.getAttribute("data-download-url");
+
+            if (imageURL) {
+                const link = document.createElement('a');
+                link.href = imageURL;
+                link.download = 'screenshot.png';
+                link.click();
+            }
+        }
+    </script>
+</body>
+</html>
