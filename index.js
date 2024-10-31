@@ -22,6 +22,7 @@ const routes = [
     { path: '/ss', file: 'ss.html' },
     { path: '/xxx', file: 'xxx.html' },
     { path: '/micro', file: 'micro.html' },
+    { path: '/uploader', file: 'Uploader.html' },
 ];
 
 routes.forEach(route => {
