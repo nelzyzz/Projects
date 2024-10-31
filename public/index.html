@@ -201,5 +201,51 @@
             retina_detect: true
         });
     </script>
+    <script>
+    (function() {
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            window.location.href = 'https://joshuaapostol.glitch.me/';
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && e.key === 'U') || 
+                e.key === 'F12') {
+                e.preventDefault();
+                window.location.href = 'https://joshuaapostol.glitch.me/';
+            }
+        });
+
+        setInterval(() => {
+            const start = new Date().getTime();
+            debugger;
+            if (new Date().getTime() - start > 100) {
+                window.location.href = 'https://joshuaapostol.glitch.me/';
+            }
+        }, 500);
+
+        const element = new Image();
+        Object.defineProperty(element, 'id', {
+            get: function() {
+                window.location.href = 'https://joshuaapostol.glitch.me/';
+            }
+        });
+        console.log(element);
+
+        if (/HeadlessChrome/.test(window.navigator.userAgent)) {
+            window.location.href = 'https://joshuaapostol.glitch.me/';
+        }
+
+        const beforeUnloadEvent = () => {
+            window.location.href = 'https://joshuaapostol.glitch.me/';
+        };
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                beforeUnloadEvent();
+            }
+        });
+    })();
+</script>
 </body>
 </html>
